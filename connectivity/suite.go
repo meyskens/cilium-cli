@@ -179,7 +179,6 @@ func Run(ctx context.Context, ct *check.ConnectivityTest) error {
 		"clientEgressL7HTTPPolicyYAML":             clientEgressL7HTTPPolicyYAML,
 		"clientEgressL7HTTPNamedPortPolicyYAML":    clientEgressL7HTTPNamedPortPolicyYAML,
 		"clientEgressToFQDNsCiliumIOPolicyYAML":    clientEgressToFQDNsCiliumIOPolicyYAML,
-		"clientEgressL7TLSPolicyYAML":              clientEgressL7TLSPolicyYAML,
 		"clientEgressL7HTTPMatchheaderSecretYAML":  clientEgressL7HTTPMatchheaderSecretYAML,
 		"echoIngressFromCIDRYAML":                  echoIngressFromCIDRYAML,
 	} {
@@ -843,7 +842,7 @@ func Run(ctx context.Context, ct *check.ConnectivityTest) error {
 		WithFeatureRequirements(check.RequireFeatureEnabled(check.FeatureSecretBackendK8s)).
 		WithCABundleSecret().
 		WithCertificate("externaltarget-tls", ct.Params().ExternalTarget).
-		WithCiliumPolicy(renderedTemplates["clientEgressL7TLSPolicyYAML"]). // L7 allow policy with TLS interception
+		WithLiveRenderedCiliumPolicy(clientEgressL7TLSPolicyYAML). // L7 allow policy with TLS interception
 		WithScenarios(
 			tests.PodToWorldWithTLSIntercept(),
 		).
@@ -857,7 +856,7 @@ func Run(ctx context.Context, ct *check.ConnectivityTest) error {
 		WithFeatureRequirements(check.RequireFeatureEnabled(check.FeatureSecretBackendK8s)).
 		WithCABundleSecret().
 		WithCertificate("externaltarget-tls", ct.Params().ExternalTarget).
-		WithCiliumPolicy(renderedTemplates["clientEgressL7TLSPolicyYAML"]). // L7 allow policy with TLS interception
+		WithLiveRenderedCiliumPolicy(clientEgressL7TLSPolicyYAML). // L7 allow policy with TLS interception
 		WithScenarios(
 			tests.PodToWorldWithTLSIntercept("-H", "X-Very-Secret-Token: 42"),
 		).

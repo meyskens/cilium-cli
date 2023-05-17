@@ -26,7 +26,7 @@ specs:
       terminatingTLS:
         secret:
           namespace: "{{.TestNamespace}}"
-          name: externaltarget-tls # internal certificate to terminate in cluster
+          name: "externaltarget-tls-{{.Name}}" # internal certificate to terminate in cluster
       originatingTLS:
         secret:
           namespace: "{{.TestNamespace}}"

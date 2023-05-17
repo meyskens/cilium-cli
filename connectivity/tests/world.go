@@ -6,6 +6,7 @@ package tests
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/cilium/cilium-cli/connectivity/check"
 )
@@ -153,6 +154,7 @@ func (s *podToWorldWithTLSIntercept) Run(ctx context.Context, t *check.Test) {
 
 		// With https, over port 443.
 		t.NewAction(s, fmt.Sprintf("https-to-%s-%d", extTarget, i), &client, https, check.IPFamilyAny).Run(func(a *check.Action) {
+			time.Sleep(5 * time.Second)
 			a.WriteDataToPod(ctx, "/tmp/test-ca.crt", caBundle)
 			a.ExecInPod(ctx, ct.CurlCommand(https, check.IPFamilyAny, s.curlOpts...))
 			a.ValidateFlows(ctx, client, a.GetEgressRequirements(fp))

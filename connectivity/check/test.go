@@ -17,6 +17,7 @@ import (
 	v2 "github.com/cilium/cilium/pkg/k8s/apis/cilium.io/v2"
 
 	"github.com/cilium/cilium-cli/defaults"
+	"github.com/cilium/cilium-cli/internal/utils"
 	"github.com/cilium/cilium-cli/sysdump"
 
 	corev1 "k8s.io/api/core/v1"
@@ -253,6 +254,24 @@ func (t *Test) Run(ctx context.Context) error {
 	// terminate this goroutine.
 
 	return nil
+}
+
+// WithLiveRenderedCiliumPolicy is like WithCiliumPolicy but it renders
+// the template on demand with the information about the current test
+// to be injected into the template.
+func (t *Test) WithLiveRenderedCiliumPolicy(policy string) *Test {
+
+	val, err := utils.RenderTemplate(policy, struct {
+		Parameters
+		Name string
+	}{
+		t.ctx.Params(),
+		t.Name(),
+	})
+	if err != nil {
+		t.Fail(err)
+	}
+	return t.WithCiliumPolicy(val)
 }
 
 // WithCiliumPolicy takes a string containing a YAML policy document and adds
@@ -546,7 +565,7 @@ func (t *Test) WithCertificate(name, hostname string) *Test {
 
 	return t.WithSecret(&corev1.Secret{
 		ObjectMeta: metav1.ObjectMeta{
-			Name: name,
+			Name: fmt.Sprintf("%s-%s", name, t.Name()),
 		},
 		Type: corev1.SecretTypeTLS,
 		Data: map[string][]byte{
